@@ -86,3 +86,40 @@ class EnvisalinkSwitch(EnvisalinkDevice, SwitchEntity):
     async def async_turn_off(self, **kwargs):
         """Send the bypass keypress sequence to toggle the zone bypass."""
         await self._controller.controller.toggle_zone_bypass(self._zone_number)
+
+        
+class EnvisalinkChimeSwitch(EnvisalinkDevice, SwitchEntity):
+    """Representation of an Envisalink switch."""
+
+    def __init__(self, hass, zone_number, zone_info, controller):
+        """Initialize the switch."""
+        xx:self._zone_number = zone_number
+        name = f"zone_num"
+        self._attr_unique_id = f"{controller.unique_id}_{name}"
+
+        self._attr_has_entity_name = True
+        if zone_info:
+            # Override the name if there is info from the YAML configuration
+            if CONF_ZONENAME in zone_info:
+                name = f"{zone_info[CONF_ZONENAME]}_bypass"
+                self._attr_has_entity_name = False
+
+        LOGGER.debug("Setting up zone: %s", name)
+        super().__init__(name, controller, STATE_CHANGE_ZONE_BYPASS, zone_number)
+
+    @property
+    def _info(self):
+        return self._controller.controller.alarm_state["zone"][self._zone_number]
+
+    @property
+    def is_on(self):
+        """Return the boolean response if the zone is bypassed."""
+        return self._info["bypassed"]
+
+    async def async_turn_on(self, **kwargs):
+        """Send the bypass keypress sequence to toggle the zone bypass."""
+        await self._controller.controller.toggle_zone_bypass(self._zone_number)
+
+    async def async_turn_off(self, **kwargs):
+        """Send the bypass keypress sequence to toggle the zone bypass."""
+        await self._controller.controller.toggle_zone_bypass(self._zone_number)
