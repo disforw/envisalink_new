@@ -91,10 +91,9 @@ class EnvisalinkSwitch(EnvisalinkDevice, SwitchEntity):
 class EnvisalinkChimeSwitch(EnvisalinkDevice, SwitchEntity):
     """Representation of an Envisalink switch."""
 
-    def __init__(self, hass, zone_number, zone_info, controller):
+    def __init__(self, hass, code, controller):
         """Initialize the switch."""
-        xx:self._zone_number = zone_number
-        name = f"zone_num"
+        name = "chime"
         self._attr_unique_id = f"{controller.unique_id}_{name}"
 
         self._attr_has_entity_name = True
@@ -117,9 +116,7 @@ class EnvisalinkChimeSwitch(EnvisalinkDevice, SwitchEntity):
         return self._info["bypassed"]
 
     async def async_turn_on(self, **kwargs):
-        """Send the bypass keypress sequence to toggle the zone bypass."""
-        await self._controller.controller.toggle_zone_bypass(self._zone_number)
+        await self._controller.controller.toggle_chime(self._code)
 
     async def async_turn_off(self, **kwargs):
-        """Send the bypass keypress sequence to toggle the zone bypass."""
-        await self._controller.controller.toggle_zone_bypass(self._zone_number)
+        await self._controller.controller.toggle_chime(self._code)
